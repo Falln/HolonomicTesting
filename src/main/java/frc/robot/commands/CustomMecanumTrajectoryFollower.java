@@ -47,9 +47,8 @@ public class CustomMecanumTrajectoryFollower extends CommandBase {
   private MecanumSubsystem driveSubsystem;
 
   /** Creates a new MecanumTrajectoryFollower. */
-  public CustomMecanumTrajectoryFollower(PathPlannerTrajectory trajectory, Supplier<Rotation2d> desiredRotation, MecanumSubsystem driveSubsystem) {
+  public CustomMecanumTrajectoryFollower(PathPlannerTrajectory trajectory, MecanumSubsystem driveSubsystem) {
     m_trajectory = trajectory;
-    //TODO add a getPose to mecanumSubsystem
     m_pose = driveSubsystem::getPose;
     m_feedforward = MecConstants.mecFeedforward;
     m_kinematics = MecConstants.mecKinematics;
@@ -76,10 +75,8 @@ public class CustomMecanumTrajectoryFollower extends CommandBase {
     m_frontRightController = new PIDController(MecConstants.wheelP, MecConstants.wheelI, MecConstants.wheelD);
     m_rearRightController = new PIDController(MecConstants.wheelP, MecConstants.wheelI, MecConstants.wheelD);
 
-    //TODO add a getWheelSpeeds to MecanumSubsystem
     m_currentWheelSpeeds = driveSubsystem::getWheelSpeeds;
-    //TODO add a way to set the wheel speeds based on volts to MecanumSubsystem using MecanumDriveVolts
-    m_outputDriveVoltages = driveSubsystem::setWheelsVolts;
+    m_outputDriveVoltages = driveSubsystem::setDriveFromVolts;
 
     addRequirements(driveSubsystem);
   }

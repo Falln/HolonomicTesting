@@ -12,6 +12,12 @@ public final class MecConstants {
 
     //Constants for a mecanum drivetrain
 
+    //Ports
+    public static final int fLeftID = 0;
+    public static final int fRightID = 1;
+    public static final int rLeftID = 2;
+    public static final int rRightID = 3;
+
     //Drivetrain PID/F constants
     public static final double xP = 1;
     public static final double xI = 0;
