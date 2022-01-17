@@ -12,11 +12,13 @@ public final class MecConstants {
 
     //Constants for a mecanum drivetrain
 
-    //Ports
+    //Ports and data
     public static final int fLeftID = 0;
     public static final int fRightID = 1;
     public static final int rLeftID = 2;
     public static final int rRightID = 3;
+
+    public static final double deadband = 0.1;
 
     //Drivetrain PID/F constants
     public static final double xP = 1;
@@ -41,12 +43,17 @@ public final class MecConstants {
     public static final double kv = 0;
     public static final SimpleMotorFeedforward mecFeedforward = new SimpleMotorFeedforward(ks, kv);
 
-    //Kinematics Constant
+    //Kinematics Constants
+    // Distance between centers of right and left wheels on robot
+    public static final double trackWidth = 0.5;
+    // Distance between centers of front and back wheels on robot
+    public static final double wheelBase = 0.7;
+
     public static final MecanumDriveKinematics mecKinematics = new MecanumDriveKinematics(
-        new Translation2d(), //frontLeftWheelMeters
-        new Translation2d(), //frontRightWheelMeters
-        new Translation2d(), //rearLeftWheelMeters
-        new Translation2d()  //rearRightWheelMeters
+        new Translation2d(wheelBase/2, trackWidth/2), //frontLeftWheelMeters
+        new Translation2d(wheelBase/2, -trackWidth/2), //frontRightWheelMeters
+        new Translation2d(-wheelBase/2, trackWidth/2), //rearLeftWheelMeters
+        new Translation2d(-wheelBase/2, -trackWidth/2)  //rearRightWheelMeters
         );
     public static final double maxWheelVelocityMetersPerSecond = 10;
 }

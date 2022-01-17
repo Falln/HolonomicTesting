@@ -4,8 +4,12 @@
 
 package frc.robot.subsystems;
 
+import java.io.IOException;
+import java.nio.file.Paths;
+
 import com.fasterxml.jackson.databind.util.RootNameLookup;
 import com.kauailabs.navx.frc.AHRS;
+import com.pathplanner.lib.*;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
@@ -15,13 +19,20 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.MecanumDriveMotorVoltages;
 import edu.wpi.first.math.kinematics.MecanumDriveOdometry;
 import edu.wpi.first.math.kinematics.MecanumDriveWheelSpeeds;
+import edu.wpi.first.math.trajectory.Trajectory;
+import edu.wpi.first.math.trajectory.TrajectoryUtil;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.SPI.Port;
 import edu.wpi.first.wpilibj.drive.MecanumDrive;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.MecConstants;
+import frc.robot.commands.CustomMecanumTrajectoryFollower;
 
 public class MecanumSubsystem extends SubsystemBase {
 
@@ -50,6 +61,7 @@ public class MecanumSubsystem extends SubsystemBase {
     rRightSpark = new CANSparkMax(MecConstants.rRightID, MotorType.kBrushless);
 
     drive = new MecanumDrive(fLeftSpark, rLeftSpark, fRightSpark, rRightSpark);
+    drive.setDeadband(MecConstants.deadband);
 
     //Instantiate Sensors
     fLeftEncoder = fLeftSpark.getEncoder();
@@ -75,9 +87,12 @@ public class MecanumSubsystem extends SubsystemBase {
 
   //Drive cartesian
   //Drive field centric
-  //Stop Drive
 
-  public void setDriveFromVolts(MecanumDriveMotorVoltages voltages) {
+  public void stopDrive() {
+    drive.stopMotor();
+  }
+
+  public void setDriveMotorsVolts(MecanumDriveMotorVoltages voltages) {
     fLeftSpark.setVoltage(voltages.frontLeftVoltage);
     fRightSpark.setVoltage(voltages.frontRightVoltage);
     rLeftSpark.setVoltage(voltages.rearLeftVoltage);
@@ -90,7 +105,10 @@ public class MecanumSubsystem extends SubsystemBase {
   public double getHeading() {
     return navX.getAngle();
   }
-  //Not sure if I need a seperate method for each encoder as each encoder shouldnt be used outside this class
+
+  public double getTurnRate() {
+    return navX.getRate();
+  }
   
   public void resetGyro() {
     navX.reset();
@@ -111,7 +129,7 @@ public class MecanumSubsystem extends SubsystemBase {
   //Trajectory following methods
 
   public void updateOdometry() {
-    odometry.update(Rotation2d.fromDegrees(getHeading()), getWheelSpeeds());
+    odometry.update(Rotation2d.fromDegrees(getHeading()), getCurrentWheelSpeeds());
   }
 
   public Pose2d getPose() {
@@ -124,7 +142,7 @@ public class MecanumSubsystem extends SubsystemBase {
     odometry.resetPosition(startingPose, Rotation2d.fromDegrees(getHeading()));
   }
 
-  public MecanumDriveWheelSpeeds getWheelSpeeds() {
+  public MecanumDriveWheelSpeeds getCurrentWheelSpeeds() {
     return new MecanumDriveWheelSpeeds(
       fLeftEncoder.getVelocity(),
       fRightEncoder.getVelocity(), 
@@ -132,13 +150,79 @@ public class MecanumSubsystem extends SubsystemBase {
       rRightEncoder.getVelocity());
   }
 
-  
+
   //Trajectory command generations methods
 
-  //
+    /**
+   * Takes a given JSON name and converts it to a WPILib Trajectory object. This method assumes that
+   * the given String is the name of a PathWeaver Path and will automatically add the .wpilib.json suffix
+   * and knows where the PathWeaver JSONs are stored. 
+   * For this project the JSONs should be stored in src\main\java\frc\robot\output 
+   * 
+   * @param pathWeaverJSONName The name of the PathWeaver JSON that you would like to load the trajectory from.
+   *                           The .wpilib.json is added automatically, so the name should only be the 
+   *                           pathName part from this example: output\<i><b>pathName</b></i>.wpilib.json
+   * @return the Trajectory loaded from the given PathWeaver JSON
+   */
+  public Trajectory loadTrajectoryFromPWJSON(String pathWeaverJSONName) {
+    try {
+      var filePath = Filesystem.getDeployDirectory().toPath().resolve(Paths.get("paths", pathWeaverJSONName + ".wpilib.json"));
+      return TrajectoryUtil.fromPathweaverJson(filePath);
+    } catch (IOException ex) {
+      DriverStation.reportError("Unable to open trajectory: " + pathWeaverJSONName, ex.getStackTrace());
+      return new Trajectory();
+    }
+  }
+
+  /** In progress */
+  public static PathPlannerTrajectory getPathPlannerTrajectory(String PathName, double maxVel, double maxAccel, Boolean reversed) {
+    return PathPlanner.loadPath(PathName, maxVel, maxAccel, reversed);
+  }
+
+  public static PathPlannerTrajectory getPathPlannerTrajectory(String PathName, double maxVel, double maxAccel) {
+    return PathPlanner.loadPath(PathName, maxVel, maxAccel, false);
+  }
+
+    /**
+   * Takes a given trajectory and creates a CustomRamseteCommand from the trajectory automatically. If
+   * initPose is set to true, it will also add a Command that will set the pose of the robot (set the 
+   * driveOdometry's pose2D) to the starting pose of the given trajectory. Note: it only sets the pose
+   * when this command is executed, not when it is created.  
+   * 
+   * @param trajectory Trajectory to be used to create the CustomRamseteCommand
+   * @param initPose Whether the starting pose of the Trajectory should be used to reset the pose 
+   *                 of the drivetrain
+   * @return The CustomRamseteCommand/Command created
+   */
+  public Command createCommandFromPlannerTrajectory(PathPlannerTrajectory trajectory, boolean isInitPose, boolean stopAtEnd) {
+    if (isInitPose && stopAtEnd) {
+      return new InstantCommand(() -> this.setPose(trajectory.getInitialPose()))
+        .andThen(new CustomMecanumTrajectoryFollower(trajectory, this))
+        .andThen(new InstantCommand(this::stopDrive));
+    } else if (isInitPose) {
+      return new InstantCommand(() -> this.setPose(trajectory.getInitialPose()))
+      .andThen(new CustomMecanumTrajectoryFollower(trajectory, this));
+    } else if (stopAtEnd) {
+      return new CustomMecanumTrajectoryFollower(trajectory, this)
+        .andThen(new InstantCommand(this::stopDrive));
+    } else {
+    return new CustomMecanumTrajectoryFollower(trajectory, this);
+    }
+  }
+
+  /**
+   * Takes a given trajectory and creates a CustomRamseteCommand from the trajectory automatically. 
+   * 
+   * @param trajectory Trajectory to be used to create the CustomRamseteCommand
+   * @return The CustomRamseteCommand/Command created
+   */
+  public Command createCommandFromPlannerTrajectory(PathPlannerTrajectory trajectory) {
+      return new CustomMecanumTrajectoryFollower(trajectory, this);
+  }
 
   @Override
   public void periodic() {
-    // This method will be called once per scheduler run
+    updateOdometry();
+    field2d.setRobotPose(odometry.getPoseMeters());
   }
 }
