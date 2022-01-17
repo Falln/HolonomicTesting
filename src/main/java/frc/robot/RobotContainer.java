@@ -12,7 +12,6 @@ import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
-import frc.robot.commands.TankDriveCommand;
 import frc.robot.subsystems.DriveSubsystem;
 
 
@@ -54,10 +53,6 @@ public class RobotContainer {
     configureButtonBindings();
 
     //Set the default commands of subsystems
-    driveSubsystem.setDefaultCommand(new TankDriveCommand(
-      () -> driverController.getLeftY(),
-      () -> driverController.getRightY(),
-      driveSubsystem));
 
     //Load all paths
     loadPathWeaverTrajectories(testPath1, testPath2, newNewPathCopy);
@@ -92,12 +87,10 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     //Generate the path commands
-    Command path1Command = driveSubsystem.createCommandFromTrajectory(testPath1.trajectory, true);
-    Command path2Command = driveSubsystem.createCommandFromTrajectory(testPath2.trajectory);
 
     //Return the combined command
     //return path1Command.andThen(new WaitCommand(2)).andThen(path2Command);
-    return driveSubsystem.createCommandFromTrajectory(newNewPathCopy.trajectory, true);
+    return null;
 
   }
 

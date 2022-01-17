@@ -220,7 +220,7 @@ public class DriveSubsystem extends SubsystemBase {
    *                           pathName part from this example: output\<i><b>pathName</b></i>.wpilib.json
    * @return the Trajectory loaded from the given PathWeaver JSON
    */
-  public Trajectory loadTrajectoryFromPWJSON(String pathWeaverJSONName) {
+  public static Trajectory loadTrajectoryFromPWJSON(String pathWeaverJSONName) {
     try {
       var filePath = Filesystem.getDeployDirectory().toPath().resolve(Paths.get("paths", pathWeaverJSONName + ".wpilib.json"));
       return TrajectoryUtil.fromPathweaverJson(filePath);
