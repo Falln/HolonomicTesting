@@ -7,12 +7,12 @@ package frc.robot.subsystems;
 import java.io.IOException;
 import java.nio.file.Paths;
 
-import com.fasterxml.jackson.databind.util.RootNameLookup;
 import com.kauailabs.navx.frc.AHRS;
-import com.pathplanner.lib.*;
+import com.pathplanner.lib.PathPlanner;
+import com.pathplanner.lib.PathPlannerTrajectory;
 import com.revrobotics.CANSparkMax;
-import com.revrobotics.RelativeEncoder;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import com.revrobotics.RelativeEncoder;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -24,7 +24,6 @@ import edu.wpi.first.math.trajectory.TrajectoryUtil;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.SPI;
-import edu.wpi.first.wpilibj.SPI.Port;
 import edu.wpi.first.wpilibj.drive.MecanumDrive;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -175,11 +174,11 @@ public class MecanumSubsystem extends SubsystemBase {
   }
 
   /** In progress */
-  public static PathPlannerTrajectory getPathPlannerTrajectory(String PathName, double maxVel, double maxAccel, Boolean reversed) {
+  public static PathPlannerTrajectory loadPathPlannerTrajectory(String PathName, double maxVel, double maxAccel, Boolean reversed) {
     return PathPlanner.loadPath(PathName, maxVel, maxAccel, reversed);
   }
 
-  public static PathPlannerTrajectory getPathPlannerTrajectory(String PathName, double maxVel, double maxAccel) {
+  public static PathPlannerTrajectory loadPathPlannerTrajectory(String PathName, double maxVel, double maxAccel) {
     return PathPlanner.loadPath(PathName, maxVel, maxAccel, false);
   }
 

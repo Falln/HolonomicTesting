@@ -1,9 +1,5 @@
 package frc.robot;
 
-import java.nio.file.DirectoryNotEmptyException;
-
-import com.fasterxml.jackson.databind.deser.std.StringArrayDeserializer;
-
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.MecanumDriveKinematics;
@@ -56,4 +52,6 @@ public final class MecConstants {
         new Translation2d(-wheelBase/2, -trackWidth/2)  //rearRightWheelMeters
         );
     public static final double maxWheelVelocityMetersPerSecond = 10;
+    public static final double driveMaxVel = 10;
+    public static final double driveMaxAcc = 5;
 }

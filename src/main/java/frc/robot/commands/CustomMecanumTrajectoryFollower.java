@@ -44,8 +44,7 @@ public class CustomMecanumTrajectoryFollower extends CommandBase {
   private final boolean usingCustomRotationInput;
   private MecanumDriveWheelSpeeds m_prevSpeeds;
   private double m_prevTime;
-  //TODO add your specific subsystem type
-  private MecanumSubsystem driveSubsystem;
+
 
   //TODO add note that this does NOT stop the robot at finish
   //Uses PathPlannerState for rotation tracking
@@ -76,6 +75,7 @@ public class CustomMecanumTrajectoryFollower extends CommandBase {
     m_outputDriveVoltages = driveSubsystem::setDriveMotorsVolts; //Consumer that will give a MecanumDriveMotorVoltages containing the volts to set each motor to
     usingCustomRotationInput = false;
 
+    //TODO add your specific subsystem type
     addRequirements(driveSubsystem);
   }
 

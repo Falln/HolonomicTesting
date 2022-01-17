@@ -4,42 +4,25 @@
 
 package frc.robot;
 
-import javax.swing.text.html.HTMLDocument.RunElement;
+import com.pathplanner.lib.PathPlannerTrajectory;
 
-import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
-import frc.robot.commands.TankDriveCommand;
-import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.subsystems.MecanumSubsystem;
 
 
 public class RobotContainer {
 
-  /**
-   * This class simply allows us to store the PathWeaver JSON name and the 
-   * trajectory associated with it in the same place (and possibly the 
-   * command created from it too - not used currently) 
-   */
-  class PathData {
-    public String JSONName;
-    public Trajectory trajectory;
-    public Command command;
-    public PathData(String pathWeaverJSON) {JSONName = pathWeaverJSON;}
-  }
-
   //Subsystems
-  private final DriveSubsystem driveSubsystem = new DriveSubsystem();
+  private final MecanumSubsystem mecanumSubsystem = new MecanumSubsystem();
 
   //Controllers and Triggers
-  private final XboxController driverController = new XboxController(0);
+  //private final XboxController driverController = new XboxController(0);
 
   //PathWeaverJSONs
-  PathData testPath1 = new PathData("testPath1");
-  PathData testPath2 = new PathData("testPath2");
-  PathData newNewPathCopy = new PathData("New New Path Copy");
+  PathData newPath = new PathData("New Path", false);
   
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
@@ -54,13 +37,9 @@ public class RobotContainer {
     configureButtonBindings();
 
     //Set the default commands of subsystems
-    driveSubsystem.setDefaultCommand(new TankDriveCommand(
-      () -> driverController.getLeftY(),
-      () -> driverController.getRightY(),
-      driveSubsystem));
 
     //Load all paths
-    loadPathWeaverTrajectories(testPath1, testPath2, newNewPathCopy);
+    loadPathPlannerTrajectories(newPath);
   }
 
 
@@ -79,9 +58,13 @@ public class RobotContainer {
    * JSONName they have, and then sets the PathData's trajectory to that trajectory
    * @param pathWeaverData PathData class to load trajectories to
    */
-  private void loadPathWeaverTrajectories(PathData... pathWeaverData) {
-    for (PathData pwData:pathWeaverData) {
-      pwData.trajectory = driveSubsystem.loadTrajectoryFromPWJSON((pwData.JSONName));
+  private void loadPathPlannerTrajectories(PathData... pathData) {
+    for (PathData pData:pathData) {
+      pData.trajectory = MecanumSubsystem.loadPathPlannerTrajectory(
+        pData.PathName,
+        pData.maxVel,
+        pData.maxAccel,
+        pData.reversed);
     }
   }
 
@@ -91,14 +74,33 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    //Generate the path commands
-    Command path1Command = driveSubsystem.createCommandFromTrajectory(testPath1.trajectory, true);
-    Command path2Command = driveSubsystem.createCommandFromTrajectory(testPath2.trajectory);
+    Command newPathCommand = mecanumSubsystem.createCommandFromPlannerTrajectory(
+      newPath.trajectory,
+      true, true);
 
-    //Return the combined command
-    //return path1Command.andThen(new WaitCommand(2)).andThen(path2Command);
-    return driveSubsystem.createCommandFromTrajectory(newNewPathCopy.trajectory, true);
+    return newPathCommand;
 
+  }
+
+  /**
+   * This class simply allows us to store the PathWeaver JSON name and the 
+   * trajectory associated with it in the same place (and possibly the 
+   * command created from it too - not used currently) 
+   */
+  public class PathData {
+    public String PathName;
+    public PathPlannerTrajectory trajectory;
+    public boolean reversed;
+    public double maxVel = MecConstants.driveMaxVel;
+    public double maxAccel = MecConstants.driveMaxAcc;
+    
+    public PathData(String pathWeaverJSON, boolean reversed) 
+      {PathName = pathWeaverJSON; this.reversed = reversed;}
+
+    public PathData(String pathWeaverJSON, boolean reversed, 
+                    double maxVel, double maxAccel) 
+      {PathName = pathWeaverJSON; this.reversed = reversed;
+       this.maxVel = maxVel; this.maxAccel = maxAccel;}
   }
 
 
