@@ -10,13 +10,16 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.subsystems.MecanumSubsystem;
+import frc.robot.subsystems.MecanumWithSparks;
 
 
 public class RobotContainer {
 
   //Subsystems
   private final MecanumSubsystem mecanumSubsystem = new MecanumSubsystem();
+  private final MecanumWithSparks mecanumWithSparks = new MecanumWithSparks();
 
   //Controllers and Triggers
   //private final XboxController driverController = new XboxController(0);
@@ -37,6 +40,10 @@ public class RobotContainer {
     configureButtonBindings();
 
     //Set the default commands of subsystems
+    mecanumSubsystem.setDefaultCommand(
+      new InstantCommand(mecanumSubsystem::stopDrive, mecanumSubsystem).perpetually());
+    mecanumWithSparks.setDefaultCommand(
+      new InstantCommand(mecanumWithSparks::stopDrive, mecanumWithSparks).perpetually());
 
     //Load all paths
     loadPathPlannerTrajectories(newPath);

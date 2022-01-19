@@ -133,8 +133,10 @@ public class CustomMecanumTrajectoryFollower extends CommandBase {
     double curTime = m_timer.get();
     double dt = curTime - m_prevTime;
 
+    //Get the desired state of the robot (cast to a PathPlannerState to get rotation)
     var desiredState = (PathPlannerState) m_trajectory.sample(curTime);
     ChassisSpeeds targetChassisSpeeds;
+    //Use the Holonomic Controller to get the ChassisSpeeds required to get to the next state based on the previous state
     if (usingCustomRotationInput) {
         targetChassisSpeeds =
         m_controller.calculate(m_pose.get(), desiredState, m_desiredRotation.get());
@@ -143,10 +145,12 @@ public class CustomMecanumTrajectoryFollower extends CommandBase {
         m_controller.calculate(m_pose.get(), desiredState, desiredState.holonomicRotation);
     }
 
+    //Change ChassisSpeeds to WheelSpeeds (m/s) using mecanum kinematics
     var targetWheelSpeeds = m_kinematics.toWheelSpeeds(targetChassisSpeeds);
 
     targetWheelSpeeds.desaturate(m_maxWheelVelocityMetersPerSecond);
 
+    //Set the PID setpoints for each wheel
     var frontLeftSpeedSetpoint = targetWheelSpeeds.frontLeftMetersPerSecond;
     var rearLeftSpeedSetpoint = targetWheelSpeeds.rearLeftMetersPerSecond;
     var frontRightSpeedSetpoint = targetWheelSpeeds.frontRightMetersPerSecond;
@@ -157,6 +161,7 @@ public class CustomMecanumTrajectoryFollower extends CommandBase {
     double frontRightOutput;
     double rearRightOutput;
 
+    //Calculate the feedforward for each wheel based on the given feedforward for the chassis
     final double frontLeftFeedforward =
         m_feedforward.calculate(
             frontLeftSpeedSetpoint,
@@ -174,6 +179,7 @@ public class CustomMecanumTrajectoryFollower extends CommandBase {
             rearRightSpeedSetpoint,
             (rearRightSpeedSetpoint - m_prevSpeeds.rearRightMetersPerSecond) / dt);
 
+    //Get the outputs of each PID controllers for each wheel based on the setpoint and feedforward
     frontLeftOutput =
         frontLeftFeedforward
             + m_frontLeftController.calculate(
@@ -191,6 +197,7 @@ public class CustomMecanumTrajectoryFollower extends CommandBase {
             + m_rearRightController.calculate(
                 m_currentWheelSpeeds.get().rearRightMetersPerSecond, rearRightSpeedSetpoint);
 
+    //Feed the output voltages of the PID loops to the drive train as a MecanumDriveMotorVoltages
     m_outputDriveVoltages.accept(
         new MecanumDriveMotorVoltages(
             frontLeftOutput, frontRightOutput, rearLeftOutput, rearRightOutput));
@@ -204,7 +211,8 @@ public class CustomMecanumTrajectoryFollower extends CommandBase {
     m_timer.stop();
   }
 
-  // Returns true when the command should end.
+  // Returns true when the command should end. This command ends once the time elapsed matches 
+  // the the time associated with the trajectory
   @Override
   public boolean isFinished() {
     return m_timer.hasElapsed(m_trajectory.getTotalTimeSeconds());

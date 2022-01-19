@@ -68,10 +68,10 @@ public class MecanumWithSparks extends SubsystemBase {
     rRightEncoder = new Encoder(MecConstants.rRightEncoderA, MecConstants.rRightEncoderB);
 
     //TODO set distance per pulse
-    fLeftEncoder.setDistancePerPulse(0);
-    fRightEncoder.setDistancePerPulse(0);
-    rLeftEncoder.setDistancePerPulse(0);
-    rRightEncoder.setDistancePerPulse(0);
+    fLeftEncoder.setDistancePerPulse(4200);
+    fRightEncoder.setDistancePerPulse(4200);
+    rLeftEncoder.setDistancePerPulse(4200);
+    rRightEncoder.setDistancePerPulse(4200);
 
     navX = new AHRS(SPI.Port.kMXP);
     navX.reset();
