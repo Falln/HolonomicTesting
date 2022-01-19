@@ -14,6 +14,16 @@ public final class MecConstants {
     public static final int rLeftID = 2;
     public static final int rRightID = 3;
 
+    public static final int fLeftEncoderA = 0;
+    public static final int fLeftEncoderB = 1;
+    public static final int fRightEncoderA = 2;
+    public static final int fRightEncoderB = 3;
+    public static final int rLeftEncoderA = 4;
+    public static final int rLeftEncoderB = 5;
+    public static final int rRightEncoderA = 6;
+    public static final int rRightEncoderB = 7;
+
+
     public static final double deadband = 0.1;
 
     //Drivetrain PID/F constants
@@ -28,8 +38,6 @@ public final class MecConstants {
     public static final double rotationP = 1;
     public static final double rotationI = 0;
     public static final double rotationD = 0;
-    public static final double rotationMaxVel = 10;
-    public static final double rotationMaxAcc = 5;
 
     public static final double wheelP = 1;
     public static final double wheelI = 0;
@@ -54,4 +62,6 @@ public final class MecConstants {
     public static final double maxWheelVelocityMetersPerSecond = 10;
     public static final double driveMaxVel = 10;
     public static final double driveMaxAcc = 5;
+    public static final double rotationMaxVel = 10;
+    public static final double rotationMaxAcc = 5;
 }

@@ -10,9 +10,6 @@ import java.nio.file.Paths;
 import com.kauailabs.navx.frc.AHRS;
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
-import com.revrobotics.CANSparkMax;
-import com.revrobotics.CANSparkMaxLowLevel.MotorType;
-import com.revrobotics.RelativeEncoder;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -22,24 +19,26 @@ import edu.wpi.first.math.kinematics.MecanumDriveWheelSpeeds;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrajectoryUtil;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.drive.MecanumDrive;
+import edu.wpi.first.wpilibj.motorcontrol.Spark;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.MecConstants;
-import frc.robot.commands.CustomMecanumTrajectoryFollower;
+import frc.robot.commands.CustomMecanumTrajectoryFollowerSparks;
 
-public class MecanumSubsystem extends SubsystemBase {
+public class MecanumWithSparks extends SubsystemBase {
 
   //4 Motors
-  CANSparkMax fLeftSpark, fRightSpark, rLeftSpark, rRightSpark;
+  Spark fLeftSpark, fRightSpark, rLeftSpark, rRightSpark;
 
   //4 encoders
-  RelativeEncoder fLeftEncoder, fRightEncoder, rLeftEncoder, rRightEncoder;
+  Encoder fLeftEncoder, fRightEncoder, rLeftEncoder, rRightEncoder;
 
   //1 gyro
   AHRS navX;
@@ -52,21 +51,27 @@ public class MecanumSubsystem extends SubsystemBase {
   MecanumDriveOdometry odometry;
 
   /** Creates a new MechanumSubsystem. */
-  public MecanumSubsystem() {
+  public MecanumWithSparks() {
     //Instantiate Motors and drive
-    fLeftSpark = new CANSparkMax(MecConstants.fLeftID, MotorType.kBrushless);
-    fRightSpark = new CANSparkMax(MecConstants.fRightID, MotorType.kBrushless);
-    rLeftSpark = new CANSparkMax(MecConstants.rLeftID, MotorType.kBrushless);
-    rRightSpark = new CANSparkMax(MecConstants.rRightID, MotorType.kBrushless);
+    fLeftSpark = new Spark(MecConstants.fLeftID);
+    fRightSpark = new Spark(MecConstants.fRightID);
+    rLeftSpark = new Spark(MecConstants.rLeftID);
+    rRightSpark = new Spark(MecConstants.rRightID);
 
     drive = new MecanumDrive(fLeftSpark, rLeftSpark, fRightSpark, rRightSpark);
     drive.setDeadband(MecConstants.deadband);
 
     //Instantiate Sensors
-    fLeftEncoder = fLeftSpark.getEncoder();
-    fRightEncoder = fRightSpark.getEncoder();
-    rLeftEncoder = rLeftSpark.getEncoder();
-    rRightEncoder = rRightSpark.getEncoder();
+    fLeftEncoder = new Encoder(MecConstants.fLeftEncoderA, MecConstants.fLeftEncoderB);
+    fRightEncoder = new Encoder(MecConstants.fRightEncoderA, MecConstants.fRightEncoderB);
+    rLeftEncoder = new Encoder(MecConstants.rLeftEncoderA, MecConstants.rLeftEncoderB);
+    rRightEncoder = new Encoder(MecConstants.rRightEncoderA, MecConstants.rRightEncoderB);
+
+    //TODO set distance per pulse
+    fLeftEncoder.setDistancePerPulse(0);
+    fRightEncoder.setDistancePerPulse(0);
+    rLeftEncoder.setDistancePerPulse(0);
+    rRightEncoder.setDistancePerPulse(0);
 
     navX = new AHRS(SPI.Port.kMXP);
     navX.reset();
@@ -119,10 +124,10 @@ public class MecanumSubsystem extends SubsystemBase {
   }
 
   public void resetEncoders() {
-    fLeftEncoder.setPosition(0);
-    fRightEncoder.setPosition(0);
-    rRightEncoder.setPosition(0);
-    rLeftEncoder.setPosition(0);
+    fLeftEncoder.reset();
+    fRightEncoder.reset();
+    rRightEncoder.reset();
+    rLeftEncoder.reset();
   }
 
 
@@ -145,10 +150,10 @@ public class MecanumSubsystem extends SubsystemBase {
   //TODO Must be in m/s
   public MecanumDriveWheelSpeeds getCurrentWheelSpeeds() {
     return new MecanumDriveWheelSpeeds(
-      fLeftEncoder.getVelocity(),
-      fRightEncoder.getVelocity(), 
-      rLeftEncoder.getVelocity(), 
-      rRightEncoder.getVelocity());
+      fLeftEncoder.getRate(),
+      fRightEncoder.getRate(), 
+      rLeftEncoder.getRate(), 
+      rRightEncoder.getRate());
   }
 
 
@@ -197,16 +202,16 @@ public class MecanumSubsystem extends SubsystemBase {
   public Command createCommandFromPlannerTrajectory(PathPlannerTrajectory trajectory, boolean isInitPose, boolean stopAtEnd) {
     if (isInitPose && stopAtEnd) {
       return new InstantCommand(() -> this.setPose(trajectory.getInitialPose()))
-        .andThen(new CustomMecanumTrajectoryFollower(trajectory, this))
+        .andThen(new CustomMecanumTrajectoryFollowerSparks(trajectory, this))
         .andThen(new InstantCommand(this::stopDrive));
     } else if (isInitPose) {
       return new InstantCommand(() -> this.setPose(trajectory.getInitialPose()))
-      .andThen(new CustomMecanumTrajectoryFollower(trajectory, this));
+      .andThen(new CustomMecanumTrajectoryFollowerSparks(trajectory, this));
     } else if (stopAtEnd) {
-      return new CustomMecanumTrajectoryFollower(trajectory, this)
+      return new CustomMecanumTrajectoryFollowerSparks(trajectory, this)
         .andThen(new InstantCommand(this::stopDrive));
     } else {
-    return new CustomMecanumTrajectoryFollower(trajectory, this);
+    return new CustomMecanumTrajectoryFollowerSparks(trajectory, this);
     }
   }
 
@@ -217,7 +222,7 @@ public class MecanumSubsystem extends SubsystemBase {
    * @return The CustomRamseteCommand/Command created
    */
   public Command createCommandFromPlannerTrajectory(PathPlannerTrajectory trajectory) {
-      return new CustomMecanumTrajectoryFollower(trajectory, this);
+      return new CustomMecanumTrajectoryFollowerSparks(trajectory, this);
   }
 
   @Override
