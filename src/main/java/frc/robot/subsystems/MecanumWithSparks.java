@@ -67,11 +67,16 @@ public class MecanumWithSparks extends SubsystemBase {
     rLeftEncoder = new Encoder(MecConstants.rLeftEncoderA, MecConstants.rLeftEncoderB);
     rRightEncoder = new Encoder(MecConstants.rRightEncoderA, MecConstants.rRightEncoderB);
 
+    fRightEncoder.setReverseDirection(MecConstants.fRightEncoderReversed);
+    fLeftEncoder.setReverseDirection(MecConstants.fLeftEncoderReversed);
+    rRightEncoder.setReverseDirection(MecConstants.rRightEncoderReversed);
+    rLeftEncoder.setReverseDirection(MecConstants.rLeftEncoderReversed);
+
     //TODO set distance per pulse
-    fLeftEncoder.setDistancePerPulse(4200);
-    fRightEncoder.setDistancePerPulse(4200);
-    rLeftEncoder.setDistancePerPulse(4200);
-    rRightEncoder.setDistancePerPulse(4200);
+    fLeftEncoder.setDistancePerPulse(MecConstants.distancePerPulseBore);
+    fRightEncoder.setDistancePerPulse(MecConstants.distancePerPulseBore);
+    rLeftEncoder.setDistancePerPulse(MecConstants.distancePerPulseBore);
+    rRightEncoder.setDistancePerPulse(MecConstants.distancePerPulseBore);
 
     navX = new AHRS(SPI.Port.kMXP);
     navX.reset();
@@ -229,5 +234,15 @@ public class MecanumWithSparks extends SubsystemBase {
   public void periodic() {
     updateOdometry();
     field2d.setRobotPose(odometry.getPoseMeters());
+    //TODO NOTE THIS SHOULD BE REMOVED LATER
+    drive.feed();
+    SmartDashboard.putNumber("Front Left Encoder Dis", fLeftEncoder.getDistance());
+    SmartDashboard.putNumber("Front Right Encoder Dis", fRightEncoder.getDistance());
+    SmartDashboard.putNumber("Rear Left Encoder Dis", rLeftEncoder.getDistance());
+    SmartDashboard.putNumber("Rear Right Encoder Dis", rRightEncoder.getDistance());
+    SmartDashboard.putNumber("Front Left Encoder Vel", fLeftEncoder.getRate());
+    SmartDashboard.putNumber("Front Right Encoder Vel", fRightEncoder.getRate());
+    SmartDashboard.putNumber("Rear Left Encoder Vel", rLeftEncoder.getRate());
+    SmartDashboard.putNumber("Rear Right Encoder Vel", rRightEncoder.getRate());
   }
 }

@@ -22,6 +22,7 @@ import edu.wpi.first.math.kinematics.MecanumDriveMotorVoltages;
 import edu.wpi.first.math.kinematics.MecanumDriveWheelSpeeds;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.MecConstants;
 import frc.robot.subsystems.MecanumSubsystem;
@@ -50,27 +51,36 @@ public class CustomMecanumTrajectoryFollower extends CommandBase {
   //Uses PathPlannerState for rotation tracking
   /** Creates a new MecanumTrajectoryFollower. */
   public CustomMecanumTrajectoryFollower(PathPlannerTrajectory trajectory, MecanumSubsystem driveSubsystem) {
+    
+    PIDController xController = new PIDController(MecConstants.xP, MecConstants.xI, MecConstants.xD);
+    PIDController yController = new PIDController(MecConstants.xP, MecConstants.xI, MecConstants.xD);
+    ProfiledPIDController rProfiledPIDController = new ProfiledPIDController(
+                                                                             MecConstants.rotationP, 
+                                                                             MecConstants.rotationI, 
+                                                                             MecConstants.rotationD, 
+                                                                             new TrapezoidProfile.Constraints(
+                                                                               MecConstants.rotationMaxVel, 
+                                                                               MecConstants.rotationMaxAcc));
+    SmartDashboard.putData("X PID Controller", xController);
+    SmartDashboard.putData("Y PID Controller", yController);
+    SmartDashboard.putData("Rotation PID Controller", rProfiledPIDController);
+    
     m_trajectory = trajectory;
     m_pose = driveSubsystem::getPose; //Supplier to get the current Pose2d of the robot
     m_feedforward = MecConstants.mecFeedforward;
     m_kinematics = MecConstants.mecKinematics;
     m_controller =
-        new HolonomicDriveController(
-            new PIDController(MecConstants.xP, MecConstants.xI, MecConstants.xD),
-            new PIDController(MecConstants.yP, MecConstants.yI, MecConstants.yD),
-            new ProfiledPIDController(
-              MecConstants.rotationP, 
-              MecConstants.rotationI, 
-              MecConstants.rotationD, 
-              new TrapezoidProfile.Constraints(
-                MecConstants.rotationMaxVel, 
-                MecConstants.rotationMaxAcc)));
+        new HolonomicDriveController(xController, yController, rProfiledPIDController);
     m_maxWheelVelocityMetersPerSecond = MecConstants.maxWheelVelocityMetersPerSecond;
     m_desiredRotation = null;
     m_frontLeftController = new PIDController(MecConstants.wheelP, MecConstants.wheelI, MecConstants.wheelD);
     m_rearLeftController = new PIDController(MecConstants.wheelP, MecConstants.wheelI, MecConstants.wheelD);
     m_frontRightController = new PIDController(MecConstants.wheelP, MecConstants.wheelI, MecConstants.wheelD);
     m_rearRightController = new PIDController(MecConstants.wheelP, MecConstants.wheelI, MecConstants.wheelD);
+    SmartDashboard.putData("Front Left PID", m_frontLeftController);
+    SmartDashboard.putData("Front Right PID", m_frontRightController);
+    SmartDashboard.putData("Rear Left PID", m_rearLeftController);
+    SmartDashboard.putData("Rear Right PID", m_rearRightController);
     m_currentWheelSpeeds = driveSubsystem::getCurrentWheelSpeeds; //Supplier to get the current MecanumWheelSpeeds
     m_outputDriveVoltages = driveSubsystem::setDriveMotorsVolts; //Consumer that will give a MecanumDriveMotorVoltages containing the volts to set each motor to
     usingCustomRotationInput = false;
@@ -138,11 +148,13 @@ public class CustomMecanumTrajectoryFollower extends CommandBase {
     ChassisSpeeds targetChassisSpeeds;
     //Use the Holonomic Controller to get the ChassisSpeeds required to get to the next state based on the previous state
     if (usingCustomRotationInput) {
-        targetChassisSpeeds =
-        m_controller.calculate(m_pose.get(), desiredState, m_desiredRotation.get());
+      SmartDashboard.putBoolean("Using PathPlanner Rotation", false);
+      targetChassisSpeeds =
+      m_controller.calculate(m_pose.get(), desiredState, m_desiredRotation.get());
     } else {
-        targetChassisSpeeds =
-        m_controller.calculate(m_pose.get(), desiredState, desiredState.holonomicRotation);
+      SmartDashboard.putBoolean("Using PathPlanner Rotation", true);
+      targetChassisSpeeds =
+      m_controller.calculate(m_pose.get(), desiredState, desiredState.holonomicRotation);
     }
 
     //Change ChassisSpeeds to WheelSpeeds (m/s) using mecanum kinematics
@@ -201,6 +213,7 @@ public class CustomMecanumTrajectoryFollower extends CommandBase {
     m_outputDriveVoltages.accept(
         new MecanumDriveMotorVoltages(
             frontLeftOutput, frontRightOutput, rearLeftOutput, rearRightOutput));
+
     m_prevTime = curTime;
     m_prevSpeeds = targetWheelSpeeds;
   }

@@ -3,6 +3,7 @@ package frc.robot;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.MecanumDriveKinematics;
+import edu.wpi.first.math.util.Units;
 
 public final class MecConstants {
 
@@ -23,6 +24,13 @@ public final class MecConstants {
     public static final int rRightEncoderA = 6;
     public static final int rRightEncoderB = 7;
 
+    public static final boolean fLeftEncoderReversed = false;
+    public static final boolean fRightEncoderReversed = true;
+    public static final boolean rLeftEncoderReversed = false;
+    public static final boolean rRightEncoderReversed = true;
+
+    public static final double wheelCircumference = Units.inchesToMeters(6)*Math.PI;
+    public static final double distancePerPulseBore = wheelCircumference/2048;
 
     public static final double deadband = 0.1;
 
@@ -43,8 +51,9 @@ public final class MecConstants {
     public static final double wheelI = 0;
     public static final double wheelD = 0;
 
-    public static final double ks = 0;
-    public static final double kv = 0;
+    public static final double ks = 0.51208;
+    public static final double kv = 2.4627;
+    public static final double ka = 0;
     public static final SimpleMotorFeedforward mecFeedforward = new SimpleMotorFeedforward(ks, kv);
 
     //Kinematics Constants
@@ -59,9 +68,11 @@ public final class MecConstants {
         new Translation2d(-wheelBase/2, trackWidth/2), //rearLeftWheelMeters
         new Translation2d(-wheelBase/2, -trackWidth/2)  //rearRightWheelMeters
         );
-    public static final double maxWheelVelocityMetersPerSecond = 10;
-    public static final double driveMaxVel = 10;
-    public static final double driveMaxAcc = 5;
-    public static final double rotationMaxVel = 10;
-    public static final double rotationMaxAcc = 5;
+
+    //NOTE THESE BELOW ARE IN FEET PER SECOND 
+    public static final double maxWheelVelocityMetersPerSecond = Units.feetToMeters(10);
+    public static final double driveMaxVel = Units.feetToMeters(10);
+    public static final double driveMaxAcc = Units.feetToMeters(5);
+    public static final double rotationMaxVel = Units.feetToMeters(10);
+    public static final double rotationMaxAcc = Units.feetToMeters(5);
 }

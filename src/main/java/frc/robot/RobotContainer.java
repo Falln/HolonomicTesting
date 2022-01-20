@@ -18,7 +18,7 @@ import frc.robot.subsystems.MecanumWithSparks;
 public class RobotContainer {
 
   //Subsystems
-  private final MecanumSubsystem mecanumSubsystem = new MecanumSubsystem();
+  //private final MecanumSubsystem mecanumSubsystem = new MecanumSubsystem();
   private final MecanumWithSparks mecanumWithSparks = new MecanumWithSparks();
 
   //Controllers and Triggers
@@ -26,6 +26,7 @@ public class RobotContainer {
 
   //PathWeaverJSONs
   PathData newPath = new PathData("New Path", false);
+  Command newPathCommand;
   
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
@@ -40,13 +41,14 @@ public class RobotContainer {
     configureButtonBindings();
 
     //Set the default commands of subsystems
-    mecanumSubsystem.setDefaultCommand(
-      new InstantCommand(mecanumSubsystem::stopDrive, mecanumSubsystem).perpetually());
     mecanumWithSparks.setDefaultCommand(
       new InstantCommand(mecanumWithSparks::stopDrive, mecanumWithSparks).perpetually());
 
     //Load all paths
     loadPathPlannerTrajectories(newPath);
+    newPathCommand = mecanumWithSparks.createCommandFromPlannerTrajectory(
+    newPath.trajectory,
+    true, true);
   }
 
 
@@ -81,18 +83,15 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    Command newPathCommand = mecanumSubsystem.createCommandFromPlannerTrajectory(
-      newPath.trajectory,
-      true, true);
-
     return newPathCommand;
 
   }
 
   /**
-   * This class simply allows us to store the PathWeaver JSON name and the 
+   * This class simply allows us to store the PathPlanner name and the 
    * trajectory associated with it in the same place (and possibly the 
-   * command created from it too - not used currently) 
+   * command created from it too - not used currently). It also allow you
+   * to specify specifc max velocity and accelerations if needed.
    */
   public class PathData {
     public String PathName;
