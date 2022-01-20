@@ -46,9 +46,8 @@ public class CustomMecanumTrajectoryFollowerSparks extends CommandBase {
   private MecanumDriveWheelSpeeds m_prevSpeeds;
   private double m_prevTime;
 
-
-  //TODO add note that this does NOT stop the robot at finish
-  //Uses PathPlannerState for rotation tracking
+  // TODO add note that this does NOT stop the robot at finish
+  // Uses PathPlannerState for rotation tracking
   /** Creates a new MecanumTrajectoryFollower. */
   public CustomMecanumTrajectoryFollowerSparks(PathPlannerTrajectory trajectory, MecanumWithSparks driveSubsystem) {
     
@@ -66,7 +65,7 @@ public class CustomMecanumTrajectoryFollowerSparks extends CommandBase {
     SmartDashboard.putData("Rotation PID Controller", rProfiledPIDController);
     
     m_trajectory = trajectory;
-    m_pose = driveSubsystem::getPose; //Supplier to get the current Pose2d of the robot
+    m_pose = driveSubsystem::getPose; // Supplier to get the current Pose2d of the robot
     m_feedforward = MecConstants.mecFeedforward;
     m_kinematics = MecConstants.mecKinematics;
     m_controller =
@@ -85,26 +84,26 @@ public class CustomMecanumTrajectoryFollowerSparks extends CommandBase {
     m_outputDriveVoltages = driveSubsystem::setDriveMotorsVolts; //Consumer that will give a MecanumDriveMotorVoltages containing the volts to set each motor to
     usingCustomRotationInput = false;
 
-    //TODO add your specific subsystem type
+    // TODO add your specific subsystem type
     addRequirements(driveSubsystem);
   }
 
-  //Uses custom rotation supplier for rotation target
-  public CustomMecanumTrajectoryFollowerSparks(PathPlannerTrajectory trajectory, Supplier<Rotation2d> desiredRotation, MecanumWithSparks driveSubsystem) {
+  // Uses custom rotation supplier for rotation target
+  public CustomMecanumTrajectoryFollowerSparks(PathPlannerTrajectory trajectory, Supplier<Rotation2d> desiredRotation,
+      MecanumWithSparks driveSubsystem) {
     m_trajectory = trajectory;
-    m_pose = driveSubsystem::getPose; //Supplier to get the current Pose2d of the robot
+    m_pose = driveSubsystem::getPose; // Supplier to get the current Pose2d of the robot
     m_feedforward = MecConstants.mecFeedforward;
     m_kinematics = MecConstants.mecKinematics;
-    m_controller =
-        new HolonomicDriveController(
-            new PIDController(MecConstants.xP, MecConstants.xI, MecConstants.xD),
-            new PIDController(MecConstants.yP, MecConstants.yI, MecConstants.yD),
-            new ProfiledPIDController(
-              MecConstants.rotationP, 
-              MecConstants.rotationI, 
-              MecConstants.rotationD, 
-              new TrapezoidProfile.Constraints(
-                MecConstants.rotationMaxVel, 
+    m_controller = new HolonomicDriveController(
+        new PIDController(MecConstants.xP, MecConstants.xI, MecConstants.xD),
+        new PIDController(MecConstants.yP, MecConstants.yI, MecConstants.yD),
+        new ProfiledPIDController(
+            MecConstants.rotationP,
+            MecConstants.rotationI,
+            MecConstants.rotationD,
+            new TrapezoidProfile.Constraints(
+                MecConstants.rotationMaxVel,
                 MecConstants.rotationMaxAcc)));
     m_maxWheelVelocityMetersPerSecond = MecConstants.maxWheelVelocityMetersPerSecond;
     m_desiredRotation = desiredRotation;
@@ -112,26 +111,22 @@ public class CustomMecanumTrajectoryFollowerSparks extends CommandBase {
     m_rearLeftController = new PIDController(MecConstants.wheelP, MecConstants.wheelI, MecConstants.wheelD);
     m_frontRightController = new PIDController(MecConstants.wheelP, MecConstants.wheelI, MecConstants.wheelD);
     m_rearRightController = new PIDController(MecConstants.wheelP, MecConstants.wheelI, MecConstants.wheelD);
-    m_currentWheelSpeeds = driveSubsystem::getCurrentWheelSpeeds; //Supplier to get the current MecanumWheelSpeeds
-    m_outputDriveVoltages = driveSubsystem::setDriveMotorsVolts; //Consumer that will give a MecanumDriveMotorVoltages containing the volts to set each motor to
+    m_currentWheelSpeeds = driveSubsystem::getCurrentWheelSpeeds; // Supplier to get the current MecanumWheelSpeeds
+    m_outputDriveVoltages = driveSubsystem::setDriveMotorsVolts; // Consumer that will give a MecanumDriveMotorVoltages
+                                                                 // containing the volts to set each motor to
     usingCustomRotationInput = true;
 
     addRequirements(driveSubsystem);
   }
 
-  
-
   // Called when the command is initially scheduled.
   public void initialize() {
     var initialState = m_trajectory.sample(0);
 
-    var initialXVelocity =
-        initialState.velocityMetersPerSecond * initialState.poseMeters.getRotation().getCos();
-    var initialYVelocity =
-        initialState.velocityMetersPerSecond * initialState.poseMeters.getRotation().getSin();
+    var initialXVelocity = initialState.velocityMetersPerSecond * initialState.poseMeters.getRotation().getCos();
+    var initialYVelocity = initialState.velocityMetersPerSecond * initialState.poseMeters.getRotation().getSin();
 
-    m_prevSpeeds =
-        m_kinematics.toWheelSpeeds(new ChassisSpeeds(initialXVelocity, initialYVelocity, 0.0));
+    m_prevSpeeds = m_kinematics.toWheelSpeeds(new ChassisSpeeds(initialXVelocity, initialYVelocity, 0.0));
 
     m_timer.reset();
     m_timer.start();

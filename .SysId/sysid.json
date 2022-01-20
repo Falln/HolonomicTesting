@@ -1,6 +1,11 @@
 {
   "SysId": {
+<<<<<<< Updated upstream
     "Analysis Type": "General Mechanism",
+=======
+    "Analysis Type": "Drivetrain",
+    "AnalyzerJSONLocation": "C:\\Users\\robotics\\Documents\\Programming\\FRC\\HolonomicTesting\\sysid_data20220119-162204.json",
+>>>>>>> Stashed changes
     "NetworkTables Settings": {
       "serverTeam": "5889"
     },

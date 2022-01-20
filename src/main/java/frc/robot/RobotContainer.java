@@ -19,7 +19,7 @@ public class RobotContainer {
 
   //Subsystems
   //private final MecanumSubsystem mecanumSubsystem = new MecanumSubsystem();
-  private final MecanumWithSparks mecanumWithSparks = new MecanumWithSparks();
+  private final MecanumWithSparks mecanumWithSparks;
 
   //Controllers and Triggers
   //private final XboxController driverController = new XboxController(0);
@@ -31,6 +31,8 @@ public class RobotContainer {
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
+
+    mecanumWithSparks = new MecanumWithSparks();
 
     //Silence the "Missing Joystick" warnings
     DriverStation.silenceJoystickConnectionWarning(true);

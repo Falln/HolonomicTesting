@@ -10,10 +10,10 @@ public final class MecConstants {
     //Constants for a mecanum drivetrain
 
     //Ports and data
-    public static final int fLeftID = 0;
-    public static final int fRightID = 1;
-    public static final int rLeftID = 2;
-    public static final int rRightID = 3;
+    public static final int fLeftID = 4;
+    public static final int fRightID = 2;
+    public static final int rLeftID = 3;
+    public static final int rRightID = 1;
 
     public static final int fLeftEncoderA = 0;
     public static final int fLeftEncoderB = 1;
@@ -35,11 +35,11 @@ public final class MecConstants {
     public static final double deadband = 0.1;
 
     //Drivetrain PID/F constants
-    public static final double xP = 1;
+    public static final double xP = 14.874;
     public static final double xI = 0;
     public static final double xD = 0;
 
-    public static final double yP = 1;
+    public static final double yP = 14.874;
     public static final double yI = 0;
     public static final double yD = 0;
     
@@ -47,20 +47,23 @@ public final class MecConstants {
     public static final double rotationI = 0;
     public static final double rotationD = 0;
 
-    public static final double wheelP = 1;
+    public static final double wheelP = 14.874;
     public static final double wheelI = 0;
     public static final double wheelD = 0;
 
-    public static final double ks = 0.51208;
-    public static final double kv = 2.4627;
-    public static final double ka = 0;
+    public static final double ksT = 0.51208;
+    public static final double kvT = 2.4627;
+    public static final double kaT = 0;
+    public static final double ks = 2.3335;
+    public static final double kv = 9.5782;
+    public static final double ka = 1.8015;
     public static final SimpleMotorFeedforward mecFeedforward = new SimpleMotorFeedforward(ks, kv);
 
     //Kinematics Constants
     // Distance between centers of right and left wheels on robot
-    public static final double trackWidth = 0.5;
+    public static final double trackWidth = Units.inchesToMeters(23);
     // Distance between centers of front and back wheels on robot
-    public static final double wheelBase = 0.7;
+    public static final double wheelBase = Units.inchesToMeters(21);
 
     public static final MecanumDriveKinematics mecKinematics = new MecanumDriveKinematics(
         new Translation2d(wheelBase/2, trackWidth/2), //frontLeftWheelMeters
