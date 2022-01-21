@@ -25,7 +25,7 @@ public class RobotContainer {
   //private final XboxController driverController = new XboxController(0);
 
   //PathWeaverJSONs
-  PathData newPath = new PathData("New Path", false);
+  PathData newPath = new PathData("Test Path", false);
   Command newPathCommand;
   
 
@@ -71,7 +71,7 @@ public class RobotContainer {
    */
   private void loadPathPlannerTrajectories(PathData... pathData) {
     for (PathData pData:pathData) {
-      pData.trajectory = MecanumSubsystem.loadPathPlannerTrajectory(
+      pData.trajectory = MecanumWithSparks.loadPathPlannerTrajectory(
         pData.PathName,
         pData.maxVel,
         pData.maxAccel,

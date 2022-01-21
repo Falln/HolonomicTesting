@@ -59,6 +59,11 @@ public class MecanumWithSparks extends SubsystemBase {
     rLeftSpark = new Spark(MecConstants.rLeftID);
     rRightSpark = new Spark(MecConstants.rRightID);
 
+    rLeftSpark.setInverted(false);
+    rRightSpark.setInverted(true);
+    fLeftSpark.setInverted(false);
+    fRightSpark.setInverted(true);
+
     drive = new MecanumDrive(fLeftSpark, rLeftSpark, fRightSpark, rRightSpark);
     drive.setDeadband(MecConstants.deadband);
 
@@ -140,7 +145,7 @@ public class MecanumWithSparks extends SubsystemBase {
   //Trajectory following methods
 
   public void updateOdometry() {
-    odometry.update(Rotation2d.fromDegrees(getHeading()), getCurrentWheelSpeeds());
+    odometry.update(Rotation2d.fromDegrees(-getHeading()), getCurrentWheelSpeeds());
   }
 
   public Pose2d getPose() {
@@ -150,7 +155,7 @@ public class MecanumWithSparks extends SubsystemBase {
   public void setPose(Pose2d startingPose) {
     resetEncoders();
     //TODO might possibly need a -getAngle() call (however, we don't seem to if we have NavX)
-    odometry.resetPosition(startingPose, Rotation2d.fromDegrees(getHeading()));
+    odometry.resetPosition(startingPose, Rotation2d.fromDegrees(-getHeading()));
   }
 
   //TODO Must be in m/s

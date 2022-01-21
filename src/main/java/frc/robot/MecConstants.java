@@ -35,11 +35,11 @@ public final class MecConstants {
     public static final double deadband = 0.1;
 
     //Drivetrain PID/F constants
-    public static final double xP = 14.874;
+    public static final double xP = 1; //14.874;
     public static final double xI = 0;
     public static final double xD = 0;
 
-    public static final double yP = 14.874;
+    public static final double yP = 1; //14.874;
     public static final double yI = 0;
     public static final double yD = 0;
     
@@ -47,16 +47,16 @@ public final class MecConstants {
     public static final double rotationI = 0;
     public static final double rotationD = 0;
 
-    public static final double wheelP = 14.874;
+    public static final double wheelP = 1; //14.874;
     public static final double wheelI = 0;
     public static final double wheelD = 0;
 
-    public static final double ksT = 0.51208;
-    public static final double kvT = 2.4627;
-    public static final double kaT = 0;
-    public static final double ks = 2.3335;
-    public static final double kv = 9.5782;
-    public static final double ka = 1.8015;
+    public static final double ks = 0.51208;
+    public static final double kv = 2.4627;
+    public static final double ka = 0;
+    public static final double ksT = 2.3335;
+    public static final double kvT = 9.5782;
+    public static final double kaT = 1.8015;
     public static final SimpleMotorFeedforward mecFeedforward = new SimpleMotorFeedforward(ks, kv);
 
     //Kinematics Constants
