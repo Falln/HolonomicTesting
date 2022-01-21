@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
 
 import edu.wpi.first.wpilibj.DriverStation;
@@ -18,11 +19,11 @@ import frc.robot.subsystems.MecanumWithSparks;
 public class RobotContainer {
 
   //Subsystems
-  //private final MecanumSubsystem mecanumSubsystem = new MecanumSubsystem();
-  private final MecanumWithSparks mecanumWithSparks;
+  private final MecanumSubsystem mecanumSubsystem = new MecanumSubsystem();
+  private final MecanumWithSparks mecanumWithSparks = new MecanumWithSparks();
 
   //Controllers and Triggers
-  //private final XboxController driverController = new XboxController(0);
+  private final XboxController driverController = new XboxController(0);
 
   //PathWeaverJSONs
   PathData newPath = new PathData("Test Path", false);
@@ -31,8 +32,6 @@ public class RobotContainer {
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
-
-    mecanumWithSparks = new MecanumWithSparks();
 
     //Silence the "Missing Joystick" warnings
     DriverStation.silenceJoystickConnectionWarning(true);
@@ -71,7 +70,7 @@ public class RobotContainer {
    */
   private void loadPathPlannerTrajectories(PathData... pathData) {
     for (PathData pData:pathData) {
-      pData.trajectory = MecanumWithSparks.loadPathPlannerTrajectory(
+      pData.trajectory = PathPlanner.loadPath(
         pData.PathName,
         pData.maxVel,
         pData.maxAccel,
