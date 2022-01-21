@@ -1,0 +1,97 @@
+{
+  "NetworkTables": {
+    "LiveWindow": {
+      "Ungrouped": {
+        "MecanumDrive[1]": {
+          "open": true
+        },
+        "open": true
+      }
+    },
+    "SmartDashboard": {
+      "Rotation PID Controller": {
+        "open": true
+      },
+      "X PID Controller": {
+        "open": true
+      },
+      "Y PID Controller": {
+        "open": true
+      },
+      "open": true
+    },
+    "types": {
+      "/FMSInfo": "FMSInfo",
+      "/LiveWindow/MecanumWithSparks": "Subsystem",
+      "/LiveWindow/Ungrouped/MecanumDrive[1]": "MecanumDrive",
+      "/LiveWindow/Ungrouped/MecanumDrive[2]": "MecanumDrive",
+      "/LiveWindow/Ungrouped/Scheduler": "Scheduler",
+      "/LiveWindow/Ungrouped/navX-Sensor[4]": "Gyro",
+      "/SmartDashboard/Field": "Field2d",
+      "/SmartDashboard/Front Left PID": "PIDController",
+      "/SmartDashboard/Front Right PID": "PIDController",
+      "/SmartDashboard/Rear Left PID": "PIDController",
+      "/SmartDashboard/Rear Right PID": "PIDController",
+      "/SmartDashboard/X PID Controller": "PIDController",
+      "/SmartDashboard/Y PID Controller": "PIDController"
+    },
+    "windows": {
+      "/LiveWindow/Ungrouped/MecanumDrive[1]": {
+        "window": {
+          "visible": true
+        }
+      },
+      "/LiveWindow/Ungrouped/Scheduler": {
+        "window": {
+          "visible": true
+        }
+      },
+      "/LiveWindow/Ungrouped/navX-Sensor[4]": {
+        "window": {
+          "visible": true
+        }
+      },
+      "/SmartDashboard/Field": {
+        "height": 8.229599952697754,
+        "width": 16.458999633789063,
+        "window": {
+          "visible": true
+        }
+      },
+      "/SmartDashboard/Front Left PID": {
+        "window": {
+          "visible": true
+        }
+      },
+      "/SmartDashboard/Front Right PID": {
+        "window": {
+          "visible": true
+        }
+      },
+      "/SmartDashboard/Rear Left PID": {
+        "window": {
+          "visible": true
+        }
+      },
+      "/SmartDashboard/Rear Right PID": {
+        "window": {
+          "visible": true
+        }
+      },
+      "/SmartDashboard/X PID Controller": {
+        "window": {
+          "visible": true
+        }
+      },
+      "/SmartDashboard/Y PID Controller": {
+        "window": {
+          "visible": true
+        }
+      }
+    }
+  },
+  "NetworkTables Settings": {
+    "mode": "Client",
+    "serverTeam": "5889"
+  }
+}

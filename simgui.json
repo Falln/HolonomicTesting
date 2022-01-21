@@ -1,0 +1,61 @@
+{
+  "HALProvider": {
+    "Other Devices": {
+      "SPARK MAX [0]": {
+        "header": {
+          "open": true
+        }
+      },
+      "SPARK MAX [1]": {
+        "header": {
+          "open": true
+        }
+      }
+    }
+  },
+  "NTProvider": {
+    "types": {
+      "/FMSInfo": "FMSInfo",
+      "/LiveWindow/MecanumSubsystem": "Subsystem",
+      "/LiveWindow/MecanumWithSparks": "Subsystem",
+      "/LiveWindow/Ungrouped/MecanumDrive[1]": "MecanumDrive",
+      "/LiveWindow/Ungrouped/MecanumDrive[2]": "MecanumDrive",
+      "/LiveWindow/Ungrouped/Scheduler": "Scheduler",
+      "/LiveWindow/Ungrouped/navX-Sensor[4]": "Gyro",
+      "/SmartDashboard/Field": "Field2d",
+      "/SmartDashboard/Front Left PID": "PIDController",
+      "/SmartDashboard/Front Right PID": "PIDController",
+      "/SmartDashboard/Rear Left PID": "PIDController",
+      "/SmartDashboard/Rear Right PID": "PIDController",
+      "/SmartDashboard/X PID Controller": "PIDController",
+      "/SmartDashboard/Y PID Controller": "PIDController"
+    },
+    "windows": {
+      "/LiveWindow/Ungrouped/Scheduler": {
+        "window": {
+          "visible": true
+        }
+      },
+      "/SmartDashboard/Field": {
+        "window": {
+          "visible": true
+        }
+      },
+      "/SmartDashboard/Front Left PID": {
+        "window": {
+          "visible": true
+        }
+      },
+      "/SmartDashboard/Front Right PID": {
+        "window": {
+          "visible": true
+        }
+      },
+      "/SmartDashboard/X PID Controller": {
+        "window": {
+          "visible": true
+        }
+      }
+    }
+  }
+}

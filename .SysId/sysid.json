@@ -1,0 +1,11 @@
+{
+  "SysId": {
+    "Analysis Type": "General Mechanism",
+    "AnalyzerJSONLocation": "C:\\Users\\isaac\\Documents\\Program Projects\\FRC\\SimulationTestingParent\\SimulationTesting-ex\\sysid_data20220119-170909.json",
+    "NetworkTables Settings": {
+      "serverTeam": "5889"
+    },
+    "mode": "Client",
+    "serverTeam": "5889"
+  }
+}
