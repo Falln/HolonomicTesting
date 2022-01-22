@@ -1,7 +1,7 @@
 {
   "SysId": {
-    "Analysis Type": "Drivetrain",
-    "AnalyzerJSONLocation": "C:\\Users\\robotics\\Documents\\Programming\\FRC\\HolonomicTesting\\sysid_data20220119-154358.json",
+    "Analysis Type": "General Mechanism",
+    "AnalyzerJSONLocation": "C:\\Users\\isaac\\Documents\\Program Projects\\FRC\\SimulationTestingParent\\SimulationTesting-ex\\sysid_data20220119-170909.json",
     "NetworkTables Settings": {
       "serverTeam": "5889"
     },

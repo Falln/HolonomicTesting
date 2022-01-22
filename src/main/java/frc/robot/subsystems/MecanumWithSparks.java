@@ -4,11 +4,7 @@
 
 package frc.robot.subsystems;
 
-import java.io.IOException;
-import java.nio.file.Paths;
-
 import com.kauailabs.navx.frc.AHRS;
-import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.PathPlannerTrajectory;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -16,12 +12,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.MecanumDriveMotorVoltages;
 import edu.wpi.first.math.kinematics.MecanumDriveOdometry;
 import edu.wpi.first.math.kinematics.MecanumDriveWheelSpeeds;
-import edu.wpi.first.math.trajectory.Trajectory;
-import edu.wpi.first.math.trajectory.TrajectoryUtil;
-import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.drive.MecanumDrive;
 import edu.wpi.first.wpilibj.motorcontrol.Spark;
@@ -78,7 +69,6 @@ public class MecanumWithSparks extends SubsystemBase {
     rRightEncoder.setReverseDirection(MecConstants.rRightEncoderReversed);
     rLeftEncoder.setReverseDirection(MecConstants.rLeftEncoderReversed);
 
-    //TODO set distance per pulse
     fLeftEncoder.setDistancePerPulse(MecConstants.distancePerPulseBore);
     fRightEncoder.setDistancePerPulse(MecConstants.distancePerPulseBore);
     rLeftEncoder.setDistancePerPulse(MecConstants.distancePerPulseBore);
@@ -88,7 +78,7 @@ public class MecanumWithSparks extends SubsystemBase {
     navX.reset();
 
     //Odometry Tracking
-    odometry = new MecanumDriveOdometry(MecConstants.mecKinematics, Rotation2d.fromDegrees(getHeading()));
+    odometry = new MecanumDriveOdometry(MecConstants.mecKinematics, Rotation2d.fromDegrees(-getHeading()));
     field2d = new Field2d();
     SmartDashboard.putData("Field", field2d);
 
@@ -113,6 +103,10 @@ public class MecanumWithSparks extends SubsystemBase {
     rLeftSpark.setVoltage(voltages.rearLeftVoltage);
     rRightSpark.setVoltage(voltages.rearRightVoltage);
     drive.feed();
+  }
+
+  public void setDriveMotorsWheelSpeeds(MecanumDriveWheelSpeeds wheelSpeeds) {
+    //Set wheel speeds using PID based on input. Can also be done with MAX software
   }
 
 
@@ -154,7 +148,6 @@ public class MecanumWithSparks extends SubsystemBase {
 
   public void setPose(Pose2d startingPose) {
     resetEncoders();
-    //TODO might possibly need a -getAngle() call (however, we don't seem to if we have NavX)
     odometry.resetPosition(startingPose, Rotation2d.fromDegrees(-getHeading()));
   }
 
@@ -168,38 +161,9 @@ public class MecanumWithSparks extends SubsystemBase {
   }
 
 
-  //Trajectory command generations methods
+  //Trajectory command generation methods
 
-    /**
-   * Takes a given JSON name and converts it to a WPILib Trajectory object. This method assumes that
-   * the given String is the name of a PathWeaver Path and will automatically add the .wpilib.json suffix
-   * and knows where the PathWeaver JSONs are stored. 
-   * For this project the JSONs should be stored in src\main\java\frc\robot\output 
-   * 
-   * @param pathWeaverJSONName The name of the PathWeaver JSON that you would like to load the trajectory from.
-   *                           The .wpilib.json is added automatically, so the name should only be the 
-   *                           pathName part from this example: output\<i><b>pathName</b></i>.wpilib.json
-   * @return the Trajectory loaded from the given PathWeaver JSON
-   */
-  public Trajectory loadTrajectoryFromPWJSON(String pathWeaverJSONName) {
-    try {
-      var filePath = Filesystem.getDeployDirectory().toPath().resolve(Paths.get("paths", pathWeaverJSONName + ".wpilib.json"));
-      return TrajectoryUtil.fromPathweaverJson(filePath);
-    } catch (IOException ex) {
-      DriverStation.reportError("Unable to open trajectory: " + pathWeaverJSONName, ex.getStackTrace());
-      return new Trajectory();
-    }
-  }
-
-  public static PathPlannerTrajectory loadPathPlannerTrajectory(String PathName, double maxVel, double maxAccel, Boolean reversed) {
-    return PathPlanner.loadPath(PathName, maxVel, maxAccel, reversed);
-  }
-
-  public static PathPlannerTrajectory PathPlannerTrajectory(String PathName, double maxVel, double maxAccel) {
-    return PathPlanner.loadPath(PathName, maxVel, maxAccel, false);
-  }
-
-    /**
+  /**
    * Takes a given trajectory and creates a CustomRamseteCommand from the trajectory automatically. If
    * initPose is set to true, it will also add a Command that will set the pose of the robot (set the 
    * driveOdometry's pose2D) to the starting pose of the given trajectory. Note: it only sets the pose
@@ -240,8 +204,6 @@ public class MecanumWithSparks extends SubsystemBase {
   public void periodic() {
     updateOdometry();
     field2d.setRobotPose(odometry.getPoseMeters());
-    //TODO NOTE THIS SHOULD BE REMOVED LATER
-    drive.feed();
     SmartDashboard.putNumber("Front Left Encoder Dis", fLeftEncoder.getDistance());
     SmartDashboard.putNumber("Front Right Encoder Dis", fRightEncoder.getDistance());
     SmartDashboard.putNumber("Rear Left Encoder Dis", rLeftEncoder.getDistance());
