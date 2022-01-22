@@ -14,6 +14,7 @@ public final class MecConstants {
     public static final int fRightID = 2;
     public static final int rLeftID = 3;
     public static final int rRightID = 1;
+    public static final int intakeID = 0;
 
     public static final int fLeftEncoderA = 0;
     public static final int fLeftEncoderB = 1;
@@ -33,6 +34,8 @@ public final class MecConstants {
     public static final double distancePerPulseBore = wheelCircumference/2048;
 
     public static final double deadband = 0.1;
+
+    public static final int lifterID = 0;
 
     //Drivetrain PID/F constants
     public static final double xP = 1; //14.874;
